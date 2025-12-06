@@ -102,8 +102,8 @@ export default function Home() {
     { title: "Vitrectomy Equipment", description: "Advanced retinal surgery tools" },
     { title: "ASCAN", description: "Advanced retinal surgery tools" },
     { title : "Pediatric Retina Checkup", description : "Gentle, compassionate care for children"},
-    {title : "Visual Fields", description : "Advanced retinal surgery tools"},
-    {title : "Fundus Flourescein Angiography", description : "Advanced retinal surgery tools"}
+    {title : "Visual Fields", description : "Advanced Glaucoma and Stroke care"},
+    {title : "Fundus Flourescein Angiography", description : "Advanced Retinal Diseases Care"}
   ]
 
   const faqs = [

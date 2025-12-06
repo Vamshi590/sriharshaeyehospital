@@ -3,22 +3,24 @@
 import type React from "react"
 import { useState } from "react"
 import { Calendar, User, Phone, Mail, MessageSquare, CheckCircle } from "lucide-react"
+import { supabase } from "../../SupabaseClient"
 
 export default function AppointmentPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    phone: "",
+    phonenumber: "",
     service: "",
     doctor: "",
-    date: "",
-    time: "",
-    message: "",
+    prefferedDate: "",
+    prefferedTime: "",
+    date : new Date(),
   })
 
   const [submitted, setSubmitted] = useState(false)
 
   const services = [
+    "General Appointment",
     "Cataract Surgery",
     "Retina Care",
     "Pediatric Eye Care",
@@ -59,10 +61,23 @@ export default function AppointmentPage() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     console.log("Form submitted:", formData)
-    setSubmitted(true)
+    try {
+      if(!formData.name && !formData.phonenumber){
+        throw new Error("Name and Phone are required")
+      }
+
+      const response = await supabase.from("Appointments").insert([formData])
+      if(response.error){
+        throw new Error("Error submitting form")
+      }
+      setSubmitted(true)
+
+    } catch (error) {
+      console.error("Error submitting form:", error)
+    }
   }
 
   return (
@@ -111,27 +126,15 @@ export default function AppointmentPage() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
-                      placeholder="John Doe"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Email *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
-                      placeholder="john@example.com"
+                      placeholder="Vamshidhar"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Phone Number *</label>
                     <input
                       type="tel"
-                      name="phone"
-                      value={formData.phone}
+                      name="phonenumber"
+                      value={formData.phonenumber}
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
@@ -195,8 +198,8 @@ export default function AppointmentPage() {
                     <label className="block text-sm font-medium text-foreground mb-2">Preferred Date *</label>
                     <input
                       type="date"
-                      name="date"
-                      value={formData.date}
+                      name="prefferedDate"
+                      value={formData.prefferedDate}
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
@@ -205,8 +208,8 @@ export default function AppointmentPage() {
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">Preferred Time *</label>
                     <select
-                      name="time"
-                      value={formData.time}
+                      name="prefferedTime"
+                      value={formData.prefferedTime}
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
@@ -222,30 +225,17 @@ export default function AppointmentPage() {
                 </div>
               </div>
 
-              {/* Additional Message */}
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Additional Message</label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  rows={4}
-                  className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white resize-none"
-                  placeholder="Tell us about your eye concerns or any specific requirements..."
-                />
-              </div>
-
               {/* Submit Button */}
               <div className="flex gap-4">
                 <button
                   type="submit"
-                  className="flex-1 px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 hover:shadow-lg"
+                  className="flex-1 px-4 py-2 md:px-8 md:py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white cursor-pointer rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 hover:shadow-lg"
                 >
                   Confirm Appointment
                 </button>
                 <button
                   type="reset"
-                  className="px-8 py-4 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-primary/5 transition-all duration-200"
+                  className="px-4 py-2 md:px-8 md:py-4 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-primary/5 transition-all duration-200"
                 >
                   Clear
                 </button>
