@@ -109,7 +109,7 @@ export default function ServicesPage() {
               return (
                 <div
                   key={index}
-                  className="group h-full p-6 bg-gradient-to-br from-blue-50 to-white rounded-2xl border border-border hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:-translate-y-2 cursor-pointer"
+                  className="group h-full p-6 bg-gradient-to-br from-blue-50 to-white rounded-2xl border border-border hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:-translate-y-2"
                 >
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
                     <Icon className="text-primary" size={24} />

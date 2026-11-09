@@ -1,1 +1,46 @@
 @import "tailwindcss";
+
+/*
+ * Brand colour tokens. These power the utility classes used across the site
+ * (bg-primary, text-foreground, border-border, bg-muted, ...).
+ */
+@theme {
+  --color-primary: #0079bf;
+  --color-primary-foreground: #ffffff;
+  --color-accent: #009790;
+  --color-accent-foreground: #ffffff;
+  --color-foreground: #080c0f;
+  --color-border: #e2e9ee;
+  --color-muted: #f1f5f9;
+}
+
+/* Shared horizontal marquee (insurance partners, testimonials). */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+
+/* Margin (not gap) so both halves are exactly equal width and the loop has no jump. */
+.marquee-track > * {
+  margin-right: 2rem;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}

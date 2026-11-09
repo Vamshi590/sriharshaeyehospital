@@ -1,72 +1,8 @@
 import { Star } from "lucide-react"
-import doctor2 from "../assets/dr srilatha final.png"
-import doctor3 from "../assets/dr ram final.png"
-import doctor4 from "../assets/dr ekta final.png"
-import doctor5 from "../assets/dr sampath final.png"
-import doctor6 from "../assets/dr swetha final.png"
-import doctor7 from "../assets/dr praneetha final.png"
-import { useNavigate } from "react-router-dom"
-
+import { Link } from "react-router-dom"
+import { bookingLink, doctors } from "../data/doctors"
 
 export default function DoctorsPage() {
-  const doctors = [
-    {
-      name: "Dr. Srilatha CH",
-      specialization: "Cataract & Refractive Surgery",
-      experience: "20+ years",
-      qualifications: "MBBS, MS (Ophthalmology), FICO",
-      bio: "Renowned for premium IOL implantation and advanced cataract surgical techniques with minimal trauma. Have done more than 20000+ cataract surgeries",
-      image: doctor2,
-      rating: 4.9,
-    },
-    {
-      name: "Dr. Ram Kumar",
-      specialization: "Retina & Vitreous",
-      experience: "18 years",
-      qualifications: "MBBS, DO (Ophthalmology)",
-      bio: "Specialized in diabetic retinopathy and retinal detachment repair with advanced imaging expertise.",
-      image: doctor3,
-      rating: 4.8,
-    },
-    {
-      name: "Dr. Ekta Agarwal",
-      specialization: "Occuloplasty Specialist",
-      experience: "15 years",
-      qualifications: "MBBS, MS (Ophthalmology), Fellowship in Occuloplasty",
-      bio: "Pioneer in glaucoma management with expertise in advanced surgical techniques and laser procedures.",
-      image: doctor4,
-      rating: 4.9,
-    },
-    {
-      name: "Dr. Sampath",
-      specialization: "Cornea Specialist",
-      experience: "12 years",
-      qualifications: "MBBS, MS (Ophthalmology)",
-      bio: "Expert in corneal transplantation and advanced corneal surgical techniques.",
-      image: doctor5,
-      rating: 4.8,
-    },
-    {
-      name: "Dr. Swetha T",
-      specialization: "Pediatric Ophthalmology & Strabismus",
-      experience: "15 years",
-      qualifications: "MBBS, MS (Ophthalmology), FICO",
-      bio: "Expert in pediatric ophthalmology and strabismus correction with advanced surgical techniques.",
-      image: doctor6,
-      rating: 4.9,
-    },
-    {
-      name: "Dr. Praneetha Goud A",
-      specialization: "Duty Medical Officer",
-      experience: "1 Year",
-      qualifications: "MBBS",
-      bio: "Expert in patient Care. and the general Ophthalmology",
-      image: doctor7,
-      rating: 4.8,
-    },
-  ]
-  const navigate = useNavigate()
-
   return (
     <main>
       {/* Header */}
@@ -83,16 +19,17 @@ export default function DoctorsPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {doctors.map((doctor, index) => (
+            {doctors.map((doctor) => (
               <div
-                key={index}
+                key={doctor.name}
                 className="group bg-gray-100 rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2"
               >
                 {/* Image */}
                 <div className="relative h-64 bg-gradient-to-br from-primary/10 to-accent/10 overflow-hidden">
                   <img
-                    src={doctor.image || "/placeholder.svg"}
+                    src={doctor.image}
                     alt={doctor.name}
+                    loading="lazy"
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
@@ -126,14 +63,21 @@ export default function DoctorsPage() {
                     <p className="text-foreground/70">
                       <span className="font-semibold">Qualifications:</span> {doctor.qualifications}
                     </p>
+                    {doctor.timings && (
+                      <p className="text-foreground/70">
+                        <span className="font-semibold">Timings:</span> {doctor.timings}
+                      </p>
+                    )}
                   </div>
 
                   <p className="text-foreground/60 text-sm leading-relaxed">{doctor.bio}</p>
 
                   {/* CTA */}
-                  <button onClick={() => {navigate("/appointment")}} className="w-full mt-6 cursor-pointer px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                  <Link
+                    to={bookingLink(doctor.name)}
+                    className="block text-center w-full mt-6 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
                     Book Consultation
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}
@@ -146,7 +90,7 @@ export default function DoctorsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             {[
-              { number: "10+", label: "Expert Doctors" },
+              { number: `${doctors.length}`, label: "Expert Doctors" },
               { number: "75+", label: "Years Combined Experience" },
               { number: "30K+", label: "Successful Surgeries" },
               { number: "98%", label: "Patient Satisfaction" },

@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import  Navbar  from "./components/navigation"
+import { useEffect } from "react"
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom"
+import Navbar from "./components/navigation"
 import { Footer } from "./components/footer"
 import Home from "./pages/home"
 import Services from "./pages/services"
@@ -9,9 +10,19 @@ import Testimonials from "./pages/testimonials"
 import Gallery from "./pages/gallery"
 import Contact from "./pages/contact"
 
+/** Client-side navigation keeps the scroll position, so reset it on every route change. */
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
+
 export default function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Navbar />
       <main className="pt-16">
         <Routes>
@@ -20,7 +31,7 @@ export default function App() {
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/appointment" element={<Appointment />} />
           <Route path="/testimonials" element={<Testimonials />} />
-          <Route path="/gallery" element={<Gallery />} /> 
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
       </main>

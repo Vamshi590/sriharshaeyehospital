@@ -1,24 +1,22 @@
-"use client"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { X } from "lucide-react"
-import operationtheatre from "../assets/infra1.png"
-import infrastructure2 from "../assets/infra4.png"
-import consultaionroom from "../assets/infra6.png"
-import waitingarea from "../assets/infra7.png"
+import operationtheatre from "../assets/infra1.webp"
+import infrastructure2 from "../assets/infra4.webp"
+import consultationroom from "../assets/infra6.webp"
+import waitingarea from "../assets/infra7.webp"
 import groupphoto from "../assets/group photo.jpeg"
 import camp from "../assets/camp.jpeg"
-import camp2 from "../assets/camp2.png"
-import reception from "../assets/reception.png"
+import camp2 from "../assets/camp2.webp"
+import reception from "../assets/reception.webp"
 import speech from "../assets/speech.jpg"
 import camp3 from "../assets/camp3.jpeg"
 import camp4 from "../assets/camp4.jpeg"
 import camp5 from "../assets/camp5.jpg"
-import ward from "../assets/ward area.png"
-import group from "../assets/group2.png"
+import ward from "../assets/ward area.webp"
+import group from "../assets/group2.webp"
 
 export default function GalleryPage() {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selected, setSelected] = useState<{ image: string; title: string } | null>(null)
 
   const galleryImages = [
     {
@@ -34,7 +32,7 @@ export default function GalleryPage() {
     {
       category: "Infrastructure",
       title: "Patient Consultation Room",
-      image: consultaionroom,
+      image: consultationroom,
     },
     {
       category: "Infrastructure",
@@ -93,6 +91,14 @@ export default function GalleryPage() {
     },
   ]
 
+  // Close the lightbox with the Escape key.
+  useEffect(() => {
+    if (!selected) return
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setSelected(null)
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [selected])
+
   const categories = ["All", ...new Set(galleryImages.map((img) => img.category))]
   const [activeCategory, setActiveCategory] = useState("All")
 
@@ -102,7 +108,7 @@ export default function GalleryPage() {
   return (
     <main>
       {/* Header */}
-      <section className="bg-gradient-to-br from-primary/10 to-accent/10 pt-16">
+      <section className="bg-gradient-to-br from-primary/10 to-accent/10 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-5xl font-bold text-foreground mb-4">Gallery</h1>
           <p className="text-lg text-foreground/70 max-w-2xl">
@@ -133,15 +139,16 @@ export default function GalleryPage() {
 
           {/* Image Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredImages.map((item, index) => (
+            {filteredImages.map((item) => (
               <div
-                key={index}
-                onClick={() => setSelectedImage(item.image)}
+                key={item.image}
+                onClick={() => setSelected(item)}
                 className="group relative h-64 rounded-2xl overflow-hidden cursor-pointer border border-border hover:border-primary/30 transition-all duration-300"
               >
                 <img
-                  src={`${item.image}`}
+                  src={item.image}
                   alt={item.title}
+                  loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
@@ -155,19 +162,24 @@ export default function GalleryPage() {
       </section>
 
       {/* Lightbox Modal */}
-      {selectedImage && (
+      {selected && (
         <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedImage(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={selected.title}
+          className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4"
+          onClick={() => setSelected(null)}
         >
           <div className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
             <button
-              onClick={() => setSelectedImage(null)}
+              onClick={() => setSelected(null)}
+              aria-label="Close"
+              autoFocus
               className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors"
             >
               <X size={32} />
             </button>
-            <img src={selectedImage || "/placeholder.svg"} alt="Gallery" className="w-full h-auto rounded-lg" />
+            <img src={selected.image} alt={selected.title} className="w-full h-auto max-h-[80vh] object-contain rounded-lg" />
           </div>
         </div>
       )}

@@ -1,18 +1,25 @@
-"use client"
-
 import type React from "react"
 import { useState } from "react"
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle } from "lucide-react"
+import {
+  ADDRESS_LINE_1,
+  ADDRESS_LINE_2,
+  EMAIL,
+  PHONE_DISPLAY,
+  PHONE_TEL,
+  whatsappLink,
+} from "../data/contact"
+
+const emptyForm = {
+  name: "",
+  email: "",
+  phone: "",
+  subject: "",
+  message: "",
+}
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    subject: "",
-    message: "",
-  })
-
+  const [formData, setFormData] = useState(emptyForm)
   const [submitted, setSubmitted] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -20,26 +27,39 @@ export default function ContactPage() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
+  const composedMessage = () =>
+    [
+      `Subject: ${formData.subject}`,
+      "",
+      formData.message,
+      "",
+      `Name: ${formData.name}`,
+      `Email: ${formData.email}`,
+      formData.phone ? `Phone: ${formData.phone}` : "",
+    ]
+      .filter((line, i, lines) => line !== "" || lines[i - 1] !== "")
+      .join("\n")
+      .trim()
+
+  const emailHref = () =>
+    `mailto:${EMAIL}?subject=${encodeURIComponent(formData.subject)}&body=${encodeURIComponent(composedMessage())}`
+
+  // There is no backend for this form: it hands the message to WhatsApp, pre-filled.
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Contact form submitted:", formData)
+    window.open(whatsappLink(composedMessage()), "_blank", "noopener,noreferrer")
     setSubmitted(true)
-    setTimeout(() => {
-      setSubmitted(false)
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
-      })
-    }, 3000)
+  }
+
+  const startOver = () => {
+    setFormData(emptyForm)
+    setSubmitted(false)
   }
 
   return (
     <main>
       {/* Header */}
-      <section className="bg-gradient-to-br from-primary/10 to-accent/10 pt-16">
+      <section className="bg-gradient-to-br from-primary/10 to-accent/10 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-5xl font-bold text-foreground mb-4">Contact Us</h1>
           <p className="text-lg text-foreground/70 max-w-2xl">
@@ -67,8 +87,8 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Phone</h3>
-                  <p className="text-foreground/60">+91 9885029367</p>
-                  <p className="text-sm text-foreground/50">Mon-Sun: 9 AM - 8 PM</p>
+                  <a href={`tel:${PHONE_TEL}`} className="text-foreground/60 hover:text-primary">{PHONE_DISPLAY}</a>
+                  <p className="text-sm text-foreground/50">Mon - Sat: 9 AM - 8 PM, Sun: 10 AM - 2:30 PM</p>
                 </div>
               </div>
 
@@ -81,7 +101,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                  <p className="text-foreground/60">sriharshaeyehospital.nabh@gmail.com</p>
+                  <a href={`mailto:${EMAIL}`} className="text-foreground/60 hover:text-primary break-all">{EMAIL}</a>
                   <p className="text-sm text-foreground/50">We'll respond within 24 hours</p>
                 </div>
               </div>
@@ -95,8 +115,8 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Address</h3>
-                  <p className="text-foreground/60">Near, Mancherial Chowrasta Circle, Ambedkar Nagar, Saraswathi Nagar,</p>
-                  <p className="text-sm text-foreground/50">Karimnagar, Telangana 505001</p>
+                  <p className="text-foreground/60">{ADDRESS_LINE_1},</p>
+                  <p className="text-sm text-foreground/50">{ADDRESS_LINE_2}</p>
                 </div>
               </div>
 
@@ -110,7 +130,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Hours</h3>
                   <p className="text-foreground/60">Mon - Sat: 9 AM - 8 PM</p>
-                  <p className="text-foreground/60">Sunday: 10 AM - 2 : 30 PM</p>
+                  <p className="text-foreground/60">Sunday: 10 AM - 2:30 PM</p>
                   <p className="text-sm text-foreground/50">Emergency: 24/7</p>
                 </div>
               </div>
@@ -123,8 +143,29 @@ export default function ContactPage() {
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
                     <CheckCircle className="text-green-600" size={32} />
                   </div>
-                  <h2 className="text-3xl font-bold text-foreground mb-3">Message Sent!</h2>
-                  <p className="text-lg text-foreground/70">Thank you for reaching out. We'll get back to you soon.</p>
+                  <h2 className="text-3xl font-bold text-foreground mb-3">Almost done!</h2>
+                  <p className="text-lg text-foreground/70 mb-6">
+                    We've opened WhatsApp with your message. Tap <strong>Send</strong> in WhatsApp to reach us.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <a
+                      href={whatsappLink(composedMessage())}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90"
+                    >
+                      Open WhatsApp again
+                    </a>
+                    <a
+                      href={emailHref()}
+                      className="px-6 py-3 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-primary/5"
+                    >
+                      Send by email instead
+                    </a>
+                    <button onClick={startOver} className="px-6 py-3 text-foreground/60 hover:text-foreground">
+                      Write another message
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -138,7 +179,7 @@ export default function ContactPage() {
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
-                        placeholder="John Doe"
+                        placeholder="Your full name"
                       />
                     </div>
                     <div>
@@ -150,7 +191,7 @@ export default function ContactPage() {
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
-                        placeholder="john@example.com"
+                        placeholder="you@example.com"
                       />
                     </div>
                   </div>
@@ -198,8 +239,14 @@ export default function ContactPage() {
                     className="w-full px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 hover:shadow-lg flex items-center justify-center gap-2"
                   >
                     <Send size={20} />
-                    Send Message
+                    Send via WhatsApp
                   </button>
+                  <p className="text-sm text-center text-foreground/50">
+                    Prefer email?{" "}
+                    <a href={emailHref()} className="text-primary font-semibold hover:underline">
+                      Send this message by email
+                    </a>
+                  </p>
                 </form>
               )}
             </div>
@@ -211,8 +258,16 @@ export default function ContactPage() {
       <section className="py-20 bg-gradient-to-br from-primary/5 to-accent/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-foreground mb-8 text-center">Find Us</h2>
-          <div className="w-full h-96 bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl border border-border flex items-center justify-center">
-           <div style={{width: "100%"}}><iframe width="100%" height="400" frameBorder={0} scrolling="no" marginHeight={0} marginWidth={0} src="https://maps.google.com/maps?width=100%25&amp;height=600&amp;hl=en&amp;q=Near,%20Mancherial%20Chowrasta%20Cir,%20Ambedkar%20Nagar,%20Saraswathi%20Nagar,%20Karimnagar,%20Telangana%20505001+(sri%20harsha%20eye%20hospital)&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=B&amp;output=embed"><a href="https://www.mapsdirections.info/de/evolkerung-auf-einer-karte-berechnen/">Bevölkerungskarte Deutschland</a></iframe></div>
+          <div className="w-full h-96 rounded-2xl border border-border overflow-hidden">
+            <iframe
+              title="Sri Harsha Eye Hospital location"
+              width="100%"
+              height="100%"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              src="https://maps.google.com/maps?hl=en&q=Near%20Mancherial%20Chowrasta%20Cir,%20Ambedkar%20Nagar,%20Saraswathi%20Nagar,%20Karimnagar,%20Telangana%20505001+(Sri%20Harsha%20Eye%20Hospital)&t=&z=15&ie=UTF8&iwloc=B&output=embed"
+              className="border-0"
+            />
           </div>
         </div>
       </section>
@@ -237,7 +292,7 @@ export default function ContactPage() {
               },
               {
                 q: "What is the recovery time after Cataract Surgery?",
-                a: "Most patients experience improved vision within 24 hours",
+                a: "Most patients experience improved vision within 24 hours.",
               },
             ].map((item, index) => (
               <div key={index} className="p-6 bg-gradient-to-br from-blue-50 to-white rounded-2xl border border-border">

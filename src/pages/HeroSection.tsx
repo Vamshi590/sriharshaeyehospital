@@ -1,18 +1,23 @@
-"use client"
-
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
+import { Link } from "react-router-dom"
 import eye from "../assets/eye.webp"
-import { useNavigate } from "react-router-dom"
+
+const quotes = [
+  "We don't just treat eyes — we restore sight, we bring back light.",
+  "See beyond limits. Live beyond blur.",
+  "Every eye tells a story. We help you see it clearly.",
+]
+
+// Generated once at module load so the particles don't jump around on every re-render.
+const particles = Array.from({ length: 20 }, () => ({
+  left: `${Math.random() * 100}%`,
+  top: `${Math.random() * 100}%`,
+  duration: `${4 + Math.random() * 4}s`,
+  delay: `${Math.random() * 2}s`,
+}))
+
 export default function HeroSection() {
   const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  const quotes = [
-    "We don't just treat eyes — we restore sight, we bring back light.",
-    "See beyond limits. Live beyond blur.",
-    "Every eye tells a story. We help you see it clearly.",
-  ]
-
 
   useEffect(() => {
     const quoteInterval = setInterval(() => {
@@ -21,11 +26,8 @@ export default function HeroSection() {
     return () => clearInterval(quoteInterval)
   }, [])
 
-  const navigate = useNavigate()
-
   return (
     <section
-      ref={containerRef}
       className="relative w-full lg:h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-blue-50 via-white to-cyan-50"
     >
       {/* Background Elements */}
@@ -35,15 +37,15 @@ export default function HeroSection() {
         <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
         <div className="absolute inset-0">
-          {[...Array(20)].map((_, i) => (
+          {particles.map((p, i) => (
             <div
               key={i}
-              className="absolute w-1 h-1 bg-blue-300 rounded-full opacity-30 animate-pulse"
+              className="absolute w-1 h-1 bg-blue-300 rounded-full opacity-30"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animation: `float ${4 + Math.random() * 4}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 2}s`,
+                left: p.left,
+                top: p.top,
+                animation: `float ${p.duration} ease-in-out infinite`,
+                animationDelay: p.delay,
               }}
             ></div>
           ))}
@@ -78,15 +80,15 @@ export default function HeroSection() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <button onClick={() => {navigate("/appointment")}} className="px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium hover:shadow-lg hover:shadow-blue-500/50 transition-all hover:scale-105 duration-300">
+            <Link to="/appointment" className="text-center px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-medium hover:shadow-lg hover:shadow-blue-500/50 transition-all hover:scale-105 duration-300">
               Book an Appointment
-            </button>
-            <button onClick={() => {navigate("/services")}} className="px-8 py-3 rounded-full border-2 border-blue-200 text-blue-600 font-medium hover:bg-blue-50 transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-blue-300/30">
+            </Link>
+            <Link to="/services" className="px-8 py-3 rounded-full border-2 border-blue-200 text-blue-600 font-medium hover:bg-blue-50 transition-all flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-blue-300/30">
               Explore Treatments
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="9 18 15 12 9 6"></polyline>
               </svg>
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -104,7 +106,7 @@ export default function HeroSection() {
             {/* Eye Image */}
             <img
               src={eye}
-              alt="3D Eye Model"
+              alt="Illustration of a human eye"
               className="w-full h-full object-contain drop-shadow-2xl animate-float"
             />
           </div>

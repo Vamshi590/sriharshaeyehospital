@@ -1,23 +1,53 @@
-"use client"
-
 import type React from "react"
 import { useState } from "react"
-import { Calendar, User, Phone, Mail, MessageSquare, CheckCircle } from "lucide-react"
-import { supabase } from "../../SupabaseClient"
+import { useSearchParams } from "react-router-dom"
+import { Calendar, User, Phone, Mail, MessageSquare, CheckCircle, AlertCircle } from "lucide-react"
+import { supabase } from "../lib/supabase"
+import { doctors as doctorList } from "../data/doctors"
+import { EMAIL, PHONE_DISPLAY, PHONE_TEL, WHATSAPP_URL } from "../data/contact"
+
+/*
+ * Field names match the columns of the Supabase "Appointments" table
+ * (including the existing spellings `phonenumber`, `prefferedDate`, `prefferedTime`).
+ * Do not rename them without migrating the table.
+ */
+type AppointmentForm = {
+  name: string
+  phonenumber: string
+  service: string
+  doctor: string
+  prefferedDate: string
+  prefferedTime: string
+}
+
+const emptyForm: AppointmentForm = {
+  name: "",
+  phonenumber: "",
+  service: "",
+  doctor: "",
+  prefferedDate: "",
+  prefferedTime: "",
+}
+
+/** Today's date as YYYY-MM-DD in the visitor's local time zone (for the date picker minimum). */
+function todayLocal() {
+  const d = new Date()
+  const pad = (n: number) => String(n).padStart(2, "0")
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
 
 export default function AppointmentPage() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phonenumber: "",
-    service: "",
-    doctor: "",
-    prefferedDate: "",
-    prefferedTime: "",
-    date : new Date(),
-  })
+  const [searchParams] = useSearchParams()
+  const doctorNames = doctorList.map((d) => d.name)
+  const requestedDoctor = searchParams.get("doctor") ?? ""
 
+  const [formData, setFormData] = useState<AppointmentForm>({
+    ...emptyForm,
+    doctor: doctorNames.includes(requestedDoctor) ? requestedDoctor : "",
+  })
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const services = [
     "General Appointment",
@@ -28,15 +58,6 @@ export default function AppointmentPage() {
     "Refractive Errors",
     "Corneal Diseases",
     "Dry Eye Syndrome",
-  ]
-
-  const doctors = [
-    "Dr. Srilatha CH",
-    "Dr. Ram Kumar",
-    "Dr. Ekta Agarwal",
-    "Dr. Sampath",
-    "Dr. Swetha T",
-    "Dr. Praneetha Goud A",
   ]
 
   const timeSlots = [
@@ -63,27 +84,53 @@ export default function AppointmentPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form submitted:", formData)
-    try {
-      if(!formData.name && !formData.phonenumber){
-        throw new Error("Name and Phone are required")
-      }
+    setError(null)
 
-      const response = await supabase.from("Appointments").insert([formData])
-      if(response.error){
-        throw new Error("Error submitting form")
-      }
-      setSubmitted(true)
-
-    } catch (error) {
-      console.error("Error submitting form:", error)
+    const name = formData.name.trim()
+    const phone = formData.phonenumber.trim()
+    if (!name || !phone) {
+      setError("Please enter your name and phone number.")
+      return
     }
+    if (phone.replace(/\D/g, "").length < 10) {
+      setError("Please enter a valid phone number (at least 10 digits).")
+      return
+    }
+    if (!supabase) {
+      setError(`Online booking is temporarily unavailable. Please call us at ${PHONE_DISPLAY}.`)
+      return
+    }
+
+    setSubmitting(true)
+    try {
+      const { error: insertError } = await supabase.from("Appointments").insert([
+        {
+          ...formData,
+          name,
+          phonenumber: phone,
+          email: "",
+          date: new Date(),
+        },
+      ])
+      if (insertError) throw insertError
+      setSubmitted(true)
+    } catch (err) {
+      console.error("Error submitting appointment:", err)
+      setError(`We couldn't submit your request. Please try again, or call us at ${PHONE_DISPLAY}.`)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleReset = () => {
+    setFormData(emptyForm)
+    setError(null)
   }
 
   return (
     <main>
       {/* Header */}
-      <section className="bg-gradient-to-br from-primary/10 to-accent/10 pt-16">
+      <section className="bg-gradient-to-br from-primary/10 to-accent/10 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-5xl font-bold text-foreground mb-4">Book an Appointment</h1>
           <p className="text-lg text-foreground/70 max-w-2xl">
@@ -100,16 +147,23 @@ export default function AppointmentPage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
                 <CheckCircle className="text-green-600" size={32} />
               </div>
-              <h2 className="text-3xl font-bold text-foreground mb-3">Appointment Confirmed!</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-3">Appointment Request Received!</h2>
               <p className="text-lg text-foreground/70 mb-6">
-                Thank you for booking with us. We'll send you a confirmation email shortly.
+                Thank you for booking with us. Our team will call you shortly to confirm your appointment.
               </p>
               <p className="text-foreground/60">
-                If you have any questions, please call us at +91 9885029367 or email sriharshaeyehospital.nabh@gmail.com
+                If you have any questions, please call us at{" "}
+                <a href={`tel:${PHONE_TEL}`} className="text-primary font-semibold hover:underline">
+                  {PHONE_DISPLAY}
+                </a>{" "}
+                or email{" "}
+                <a href={`mailto:${EMAIL}`} className="text-primary font-semibold hover:underline">
+                  {EMAIL}
+                </a>
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} onReset={handleReset} className="space-y-8">
               {/* Personal Information */}
               <div>
                 <h3 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
@@ -126,7 +180,7 @@ export default function AppointmentPage() {
                       onChange={handleChange}
                       required
                       className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
-                      placeholder="Vamshidhar"
+                      placeholder="Your full name"
                     />
                   </div>
                   <div>
@@ -177,7 +231,7 @@ export default function AppointmentPage() {
                       className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
                     >
                       <option value="">Any available doctor</option>
-                      {doctors.map((doctor) => (
+                      {doctorNames.map((doctor) => (
                         <option key={doctor} value={doctor}>
                           {doctor}
                         </option>
@@ -199,6 +253,7 @@ export default function AppointmentPage() {
                     <input
                       type="date"
                       name="prefferedDate"
+                      min={todayLocal()}
                       value={formData.prefferedDate}
                       onChange={handleChange}
                       required
@@ -225,13 +280,21 @@ export default function AppointmentPage() {
                 </div>
               </div>
 
+              {error && (
+                <div role="alert" className="flex items-start gap-2 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
+                  <AlertCircle size={20} className="flex-shrink-0 mt-0.5" />
+                  <p>{error}</p>
+                </div>
+              )}
+
               {/* Submit Button */}
               <div className="flex gap-4">
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 md:px-8 md:py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white cursor-pointer rounded-lg font-semibold hover:bg-primary/90 transition-all duration-200 hover:shadow-lg"
+                  disabled={submitting}
+                  className="flex-1 px-4 py-2 md:px-8 md:py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white cursor-pointer rounded-lg font-semibold transition-all duration-200 hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Confirm Appointment
+                  {submitting ? "Submitting..." : "Request Appointment"}
                 </button>
                 <button
                   type="reset"
@@ -269,7 +332,7 @@ export default function AppointmentPage() {
               {
                 step: "4",
                 title: "Confirmation",
-                description: "Receive confirmation via email and SMS",
+                description: "Our team will call you to confirm your appointment",
               },
             ].map((item, index) => (
               <div key={index} className="text-center border-2 border-gray-200 p-6 rounded-lg">
@@ -294,32 +357,38 @@ export default function AppointmentPage() {
                 icon: Phone,
                 title: "Call Us",
                 description: "Speak directly with our appointment team",
-                contact: "91 9885029367",
+                contact: PHONE_DISPLAY,
+                href: `tel:${PHONE_TEL}`,
               },
               {
                 icon: Mail,
                 title: "Email Us",
                 description: "Send us your appointment request",
-                contact: "sriharshaeyehospital.nabh@gmail.com",
+                contact: EMAIL,
+                href: `mailto:${EMAIL}`,
               },
               {
                 icon: MessageSquare,
                 title: "WhatsApp",
                 description: "Quick booking via WhatsApp",
-                contact: "91 9885029367",
+                contact: PHONE_DISPLAY,
+                href: WHATSAPP_URL,
               },
-            ].map((item, index) => {
+            ].map((item) => {
               const Icon = item.icon
               return (
-                <div
-                  key={index}
-                  className="p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl border border-border text-center"
+                <a
+                  key={item.title}
+                  href={item.href}
+                  target={item.href.startsWith("http") ? "_blank" : undefined}
+                  rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="block p-8 bg-gradient-to-br from-blue-50 to-white rounded-2xl border border-border text-center hover:border-primary/30 hover:shadow-lg transition-all"
                 >
                   <Icon className="text-primary mx-auto mb-4" size={32} />
                   <h3 className="font-semibold text-lg text-foreground mb-2">{item.title}</h3>
                   <p className="text-sm text-foreground/60 mb-4">{item.description}</p>
-                  <p className="font-semibold text-primary">{item.contact}</p>
-                </div>
+                  <p className="font-semibold text-primary break-all">{item.contact}</p>
+                </a>
               )
             })}
           </div>

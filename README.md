@@ -1,73 +1,63 @@
-# React + TypeScript + Vite
+# Sri Harsha Eye Hospital – Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Marketing and appointment-booking website for Sri Harsha Eye Hospital, Karimnagar.
 
-Currently, two official plugins are available:
+**Stack:** React 19 · TypeScript · Vite · Tailwind CSS v4 · React Router · Supabase · deployed on Vercel.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Getting started
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+cp .env.example .env   # then fill in the Supabase values
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+| Command           | What it does                         |
+| ----------------- | ------------------------------------ |
+| `npm run dev`     | Start the dev server                 |
+| `npm run build`   | Type-check and build to `dist/`      |
+| `npm run preview` | Serve the production build locally   |
+| `npm run lint`    | Run ESLint                           |
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Environment variables
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Name                 | Description                     |
+| -------------------- | ------------------------------- |
+| `VITE_SUPABASE_URL`  | Supabase project URL            |
+| `VITE_SUPABASE_KEY`  | Supabase anon (public) key      |
+
+If these are missing the site still loads, but the appointment form shows a
+"call us" message instead of submitting.
+
+## Project structure
+
 ```
+src/
+  App.tsx              Routes + layout (navbar, footer, scroll-to-top)
+  index.css            Tailwind import, brand colour tokens, marquee animation
+  components/          Navbar, footer, insurance & testimonial marquees
+  pages/               One file per route (home, services, doctors, appointment, …)
+  data/                Editable content: doctors, testimonials, contact details
+  lib/supabase.ts      Supabase client
+  assets/              Images (WebP where possible – keep new photos ≤ 1600px wide)
+public/                Static files served as-is (favicon)
+```
+
+### Editing content
+
+- **Doctors** – `src/data/doctors.ts` (used by the home page, doctors page and booking form).
+  Set `featured: true` to show a doctor on the home page.
+- **Testimonials** – `src/data/testimonials.ts` (home page marquee and testimonials page).
+- **Phone / email / address** – `src/data/contact.ts`.
+
+## Forms
+
+- **Appointment form** inserts a row into the Supabase `Appointments` table with the columns
+  `name, phonenumber, service, doctor, prefferedDate, prefferedTime, email, date`
+  (column spellings are kept as they exist in the database).
+- **Contact form** has no backend – it opens WhatsApp (or email) with the message pre-filled.
+
+## Deployment
+
+Deployed on Vercel. `vercel.json` rewrites all paths to `index.html` so client-side routes work on refresh.
+Add the two environment variables above in the Vercel project settings.

@@ -12,14 +12,12 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.86.2",
     "@tailwindcss/vite": "^4.1.16",
-    "dotenv": "^17.2.3",
     "lucide-react": "^0.548.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.4",
     "react-slick": "^0.31.0",
     "slick-carousel": "^1.8.1",
-    "supabase": "^2.65.6",
     "tailwindcss": "^4.1.16"
   },
   "devDependencies": {
