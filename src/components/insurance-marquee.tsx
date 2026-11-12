@@ -7,7 +7,7 @@ import mediassist from "../assets/mediassist.webp"
 import starhealth from "../assets/Star_Health.webp"
 import sbigeneral from "../assets/sbi general insurance logo.png"
 import reliancegeneral from "../assets/reliance general logo.png"
-import nia from "../assets/nialogo-org.jpg"
+import nia from "../assets/nialogo-org.webp"
 import iffcotokio from "../assets/iffco tokio insurance logo.webp"
 import ericsson from "../assets/Ericsson_logo.webp"
 import { PHONE_DISPLAY, PHONE_TEL } from "../data/contact"
@@ -34,8 +34,8 @@ export function InsuranceMarquee() {
     <section className="py-8 bg-gradient-to-br from-slate-50 via-white to-slate-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6 text-center">
-          <h3 className="text-lg font-semibold text-primary uppercase tracking-wider">Insurance Partners</h3>
-          <p className="text-foreground/60 text-sm mt-1">We accept all major insurance providers</p>
+          <h2 className="text-lg font-semibold text-primary uppercase tracking-wider">Insurance Partners</h2>
+          <p className="text-foreground/75 text-sm mt-1">Cashless treatment with these insurers, Aarogyasri and EHS</p>
         </div>
 
         <div className="relative overflow-hidden">
@@ -47,15 +47,15 @@ export function InsuranceMarquee() {
                 className="flex-shrink-0 flex flex-col items-center justify-center gap-2 px-6 py-3 bg-white border-[1.5px] border-gray-200 rounded-lg font-semibold text-gray-800 text-center shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[#9db4c0] hover:shadow-md"
               >
                 {insurance.name}
-                <img src={insurance.logo} className="h-8 md:h-12 w-auto" alt="" loading="lazy" />
+                <img src={insurance.logo} className="h-8 md:h-12 w-auto" alt="" loading="lazy" decoding="async" />
               </div>
             ))}
           </div>
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-xs text-foreground/50">
-            For specific coverage details, please contact our billing department at{" "}
+          <p className="text-xs text-foreground/70">
+            For specific coverage details, please call us at{" "}
             <a href={`tel:${PHONE_TEL}`} className="font-semibold text-primary hover:underline">
               {PHONE_DISPLAY}
             </a>

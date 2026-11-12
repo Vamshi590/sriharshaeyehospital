@@ -1,14 +1,21 @@
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Phone, Mail, MapPin, Clock, Send, CheckCircle } from "lucide-react"
 import {
   ADDRESS_LINE_1,
   ADDRESS_LINE_2,
   EMAIL,
   PHONE_DISPLAY,
+  OPENING_HOURS,
+  PHONE2_DISPLAY,
+  PHONE2_TEL,
   PHONE_TEL,
   whatsappLink,
 } from "../data/contact"
+import { contactFaqs } from "../data/faqs"
+import { JsonLd } from "../components/json-ld"
+import { faqSchema } from "../seo/schema"
+import { MapEmbed } from "../components/map-embed"
 
 const emptyForm = {
   name: "",
@@ -21,6 +28,10 @@ const emptyForm = {
 export default function ContactPage() {
   const [formData, setFormData] = useState(emptyForm)
   const [submitted, setSubmitted] = useState(false)
+  const doneRef = useRef<HTMLHeadingElement>(null)
+  useEffect(() => {
+    if (submitted) doneRef.current?.focus()
+  }, [submitted])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -34,7 +45,7 @@ export default function ContactPage() {
       formData.message,
       "",
       `Name: ${formData.name}`,
-      `Email: ${formData.email}`,
+      formData.email ? `Email: ${formData.email}` : "",
       formData.phone ? `Phone: ${formData.phone}` : "",
     ]
       .filter((line, i, lines) => line !== "" || lines[i - 1] !== "")
@@ -57,9 +68,9 @@ export default function ContactPage() {
   }
 
   return (
-    <main>
+    <div>
       {/* Header */}
-      <section className="bg-gradient-to-br from-primary/10 to-accent/10 py-16">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-cyan-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-5xl font-bold text-foreground mb-4">Contact Us</h1>
           <p className="text-lg text-foreground/70 max-w-2xl">
@@ -87,8 +98,9 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Phone</h3>
-                  <a href={`tel:${PHONE_TEL}`} className="text-foreground/60 hover:text-primary">{PHONE_DISPLAY}</a>
-                  <p className="text-sm text-foreground/50">Mon - Sat: 9 AM - 8 PM, Sun: 10 AM - 2:30 PM</p>
+                  <a href={`tel:${PHONE_TEL}`} className="block text-foreground/75 hover:text-primary">{PHONE_DISPLAY}</a>
+                  <a href={`tel:${PHONE2_TEL}`} className="block text-foreground/75 hover:text-primary">{PHONE2_DISPLAY}</a>
+                  <p className="text-sm text-foreground/70">Mon - Sat: 9 AM - 8 PM, Sun: 10 AM - 2:30 PM</p>
                 </div>
               </div>
 
@@ -101,8 +113,8 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                  <a href={`mailto:${EMAIL}`} className="text-foreground/60 hover:text-primary break-all">{EMAIL}</a>
-                  <p className="text-sm text-foreground/50">We'll respond within 24 hours</p>
+                  <a href={`mailto:${EMAIL}`} className="inline-block py-1 text-foreground/75 hover:text-primary break-all">{EMAIL}</a>
+                  <p className="text-sm text-foreground/70">We'll respond within 24 hours</p>
                 </div>
               </div>
 
@@ -115,8 +127,8 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Address</h3>
-                  <p className="text-foreground/60">{ADDRESS_LINE_1},</p>
-                  <p className="text-sm text-foreground/50">{ADDRESS_LINE_2}</p>
+                  <p className="text-foreground/75">{ADDRESS_LINE_1},</p>
+                  <p className="text-sm text-foreground/70">{ADDRESS_LINE_2}</p>
                 </div>
               </div>
 
@@ -129,9 +141,12 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Hours</h3>
-                  <p className="text-foreground/60">Mon - Sat: 9 AM - 8 PM</p>
-                  <p className="text-foreground/60">Sunday: 10 AM - 2:30 PM</p>
-                  <p className="text-sm text-foreground/50">Emergency: 24/7</p>
+                  {OPENING_HOURS.map((h) => (
+                    <p key={h.label} className="text-foreground/75">
+                      {h.label}: {h.display}
+                    </p>
+                  ))}
+                  <p className="text-sm text-foreground/70">Emergency: 24/7</p>
                 </div>
               </div>
             </div>
@@ -139,11 +154,11 @@ export default function ContactPage() {
             {/* Contact Form */}
             <div className="lg:col-span-2">
               {submitted ? (
-                <div className="text-center py-12">
+                <div role="status" className="text-center py-12">
                   <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
-                    <CheckCircle className="text-green-600" size={32} />
+                    <CheckCircle className="text-green-700" size={32} aria-hidden="true" />
                   </div>
-                  <h2 className="text-3xl font-bold text-foreground mb-3">Almost done!</h2>
+                  <h2 ref={doneRef} tabIndex={-1} className="text-3xl font-bold text-foreground mb-3 focus:outline-none">Almost done!</h2>
                   <p className="text-lg text-foreground/70 mb-6">
                     We've opened WhatsApp with your message. Tap <strong>Send</strong> in WhatsApp to reach us.
                   </p>
@@ -162,7 +177,7 @@ export default function ContactPage() {
                     >
                       Send by email instead
                     </a>
-                    <button onClick={startOver} className="px-6 py-3 text-foreground/60 hover:text-foreground">
+                    <button onClick={startOver} className="px-6 py-3 text-foreground/75 hover:text-foreground">
                       Write another message
                     </button>
                   </div>
@@ -171,25 +186,28 @@ export default function ContactPage() {
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">Full Name *</label>
+                      <label htmlFor="contact-name" className="block text-sm font-medium text-foreground mb-2">Full Name *</label>
                       <input
                         type="text"
+                        id="contact-name"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
                         required
+                        autoComplete="name"
                         className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
                         placeholder="Your full name"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">Email *</label>
+                      <label htmlFor="contact-email" className="block text-sm font-medium text-foreground mb-2">Email <span className="font-normal text-foreground/70">(optional)</span></label>
                       <input
                         type="email"
+                        id="contact-email"
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        required
+                        autoComplete="email"
                         className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
                         placeholder="you@example.com"
                       />
@@ -197,10 +215,12 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Phone Number</label>
+                    <label htmlFor="contact-phone" className="block text-sm font-medium text-foreground mb-2">Phone Number</label>
                     <input
                       type="tel"
+                      id="contact-phone"
                       name="phone"
+                      autoComplete="tel"
                       value={formData.phone}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
@@ -209,9 +229,10 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Subject *</label>
+                    <label htmlFor="contact-subject" className="block text-sm font-medium text-foreground mb-2">Subject *</label>
                     <input
                       type="text"
+                      id="contact-subject"
                       name="subject"
                       value={formData.subject}
                       onChange={handleChange}
@@ -222,8 +243,9 @@ export default function ContactPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Message *</label>
+                    <label htmlFor="contact-message" className="block text-sm font-medium text-foreground mb-2">Message *</label>
                     <textarea
+                      id="contact-message"
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
@@ -241,7 +263,7 @@ export default function ContactPage() {
                     <Send size={20} />
                     Send via WhatsApp
                   </button>
-                  <p className="text-sm text-center text-foreground/50">
+                  <p className="text-sm text-center text-foreground/70">
                     Prefer email?{" "}
                     <a href={emailHref()} className="text-primary font-semibold hover:underline">
                       Send this message by email
@@ -259,15 +281,7 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-foreground mb-8 text-center">Find Us</h2>
           <div className="w-full h-96 rounded-2xl border border-border overflow-hidden">
-            <iframe
-              title="Sri Harsha Eye Hospital location"
-              width="100%"
-              height="100%"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              src="https://maps.google.com/maps?hl=en&q=Near%20Mancherial%20Chowrasta%20Cir,%20Ambedkar%20Nagar,%20Saraswathi%20Nagar,%20Karimnagar,%20Telangana%20505001+(Sri%20Harsha%20Eye%20Hospital)&t=&z=15&ie=UTF8&iwloc=B&output=embed"
-              className="border-0"
-            />
+            <MapEmbed />
           </div>
         </div>
       </section>
@@ -277,32 +291,16 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-foreground mb-12 text-center">Frequently Asked Questions</h2>
           <div className="space-y-6">
-            {[
-              {
-                q: "How do I book an appointment?",
-                a: "You can book an appointment through our online form, call us, or send us a WhatsApp message. We'll confirm your appointment within 24 hours.",
-              },
-              {
-                q: "What should I bring for my first visit?",
-                a: "Please bring a valid ID, insurance card (if applicable), and any previous eye exam reports or prescriptions.",
-              },
-              {
-                q: "Do you accept insurance?",
-                a: "Yes, we accept most major insurance plans. Please contact us to verify your coverage.",
-              },
-              {
-                q: "What is the recovery time after Cataract Surgery?",
-                a: "Most patients experience improved vision within 24 hours.",
-              },
-            ].map((item, index) => (
-              <div key={index} className="p-6 bg-gradient-to-br from-blue-50 to-white rounded-2xl border border-border">
-                <h3 className="font-semibold text-lg text-foreground mb-3">{item.q}</h3>
-                <p className="text-foreground/70">{item.a}</p>
+            {contactFaqs.map((item) => (
+              <div key={item.question} className="p-6 bg-gradient-to-br from-blue-50 to-white rounded-2xl border border-border">
+                <h3 className="font-semibold text-lg text-foreground mb-3">{item.question}</h3>
+                <p className="text-foreground/70">{item.answer}</p>
               </div>
             ))}
           </div>
+          <JsonLd data={faqSchema(contactFaqs)} />
         </div>
       </section>
-    </main>
+    </div>
   )
 }

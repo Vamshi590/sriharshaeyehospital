@@ -15,9 +15,23 @@ export type Doctor = {
   rating: number
   /** Consultation timings, where published. */
   timings?: string
+  /** State / National Medical Register number. NMC requires it next to the doctor's name in public communication. */
+  registrationNumber?: string
   /** Shown in the "Meet Our Doctors" section on the home page. */
   featured?: boolean
+  /** Languages the doctor consults in — fill in once confirmed. */
+  languages?: string[]
+  /** "resident" doctors are at the hospital daily; "visiting" consultants come on set days. */
+  availability?: "resident" | "visiting"
+  /**
+   * Bookable hours, mirroring `timings` (keep the two in sync). Days: 0 = Sunday ... 6 = Saturday.
+   * `nth` limits a block to the nth such weekday of the month (e.g. 4 = 4th Sunday).
+   * Doctors without a schedule can be booked during the hospital's opening hours.
+   */
+  schedule?: DoctorSession[]
 }
+
+export type DoctorSession = { days: number[]; nth?: number; ranges: [from: string, to: string][] }
 
 /** Single source of truth for doctor details (home page, doctors page, booking form). */
 export const doctors: Doctor[] = [
@@ -26,10 +40,14 @@ export const doctors: Doctor[] = [
     specialization: "Cataract & Refractive Surgery",
     experience: "20+ years",
     qualifications: "MBBS, MS (Ophthalmology), FICLEP (LVPEI), FICO (UK)",
-    bio: "Renowned for premium IOL implantation and advanced cataract surgical techniques with minimal trauma. Has performed more than 20,000 cataract surgeries.",
+    bio: "Specialises in cataract surgery with premium IOL (lens) implantation and small-incision techniques. Has performed more than 20,000 cataract surgeries.",
     image: srilatha,
     rating: 4.9,
     timings: "Mon - Sat: 10:00 AM - 2:30 PM, 6:00 PM - 7:30 PM | Sun: 10:00 AM - 1:30 PM",
+    schedule: [
+      { days: [1, 2, 3, 4, 5, 6], ranges: [["10:00", "14:30"], ["18:00", "19:30"]] },
+      { days: [0], ranges: [["10:00", "13:30"]] },
+    ],
     featured: true,
   },
   {
@@ -37,10 +55,12 @@ export const doctors: Doctor[] = [
     specialization: "Retina & Vitreous",
     experience: "18+ years",
     qualifications: "MBBS, DO (Ophthalmology)",
-    bio: "Specialized in diabetic retinopathy and retinal detachment repair with advanced imaging expertise.",
+    bio: "Specialises in diabetic retinopathy and retinal detachment, using OCT and angiography imaging.",
     image: ram,
     rating: 4.8,
     timings: "Monthly, 4th Sunday: 08:00 AM - 10:00 AM (Visiting Consultant)",
+    schedule: [{ days: [0], nth: 4, ranges: [["08:00", "10:00"]] }],
+    availability: "visiting",
     featured: true,
   },
   {
@@ -48,10 +68,12 @@ export const doctors: Doctor[] = [
     specialization: "Oculoplasty Specialist",
     experience: "15+ years",
     qualifications: "MBBS, MS (Ophthalmology), Fellowship in Oculoplasty",
-    bio: "Expert in eyelid surgery and cosmetic procedures with a focus on natural, beautiful results.",
+    bio: "Specialises in eyelid, tear duct and orbit surgery, including cosmetic eyelid procedures.",
     image: ekta,
     rating: 4.8,
     timings: "Monthly, 3rd Friday: 09:30 AM - 12:30 PM (Visiting Consultant)",
+    schedule: [{ days: [5], nth: 3, ranges: [["09:30", "12:30"]] }],
+    availability: "visiting",
     featured: true,
   },
   {
@@ -59,7 +81,7 @@ export const doctors: Doctor[] = [
     specialization: "Cornea Specialist",
     experience: "12+ years",
     qualifications: "MBBS, MS (Ophthalmology)",
-    bio: "Expert in corneal transplantation and advanced corneal surgical techniques.",
+    bio: "Specialises in corneal diseases and corneal transplantation.",
     image: sampath,
     rating: 4.8,
   },
@@ -68,7 +90,7 @@ export const doctors: Doctor[] = [
     specialization: "Pediatric Ophthalmology & Strabismus",
     experience: "15+ years",
     qualifications: "MBBS, MS (Ophthalmology), FICO",
-    bio: "Expert in pediatric ophthalmology and strabismus correction with advanced surgical techniques.",
+    bio: "Specialises in children's eye care and squint (strabismus) correction.",
     image: swetha,
     rating: 4.9,
   },
@@ -82,6 +104,21 @@ export const doctors: Doctor[] = [
     rating: 4.8,
   },
 ]
+
+/** URL slug, e.g. "Dr. Srilatha CH" -> "dr-srilatha-ch". */
+export function doctorSlug(d: Pick<Doctor, "name">) {
+  return d.name.toLowerCase().replace(/\./g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+}
+
+export const doctorPath = (d: Pick<Doctor, "name">) => `/doctors/${doctorSlug(d)}`
+
+export function doctorBySlug(slug: string | undefined) {
+  return doctors.find((d) => doctorSlug(d) === slug)
+}
+
+export function doctorByName(name: string) {
+  return doctors.find((d) => d.name === name)
+}
 
 /** Link to the booking page with the doctor pre-selected. */
 export function bookingLink(doctorName?: string) {

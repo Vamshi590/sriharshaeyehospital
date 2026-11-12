@@ -5,7 +5,8 @@
  * (bg-primary, text-foreground, border-border, bg-muted, ...).
  */
 @theme {
-  --color-primary: #0079bf;
+  /* #006dad (was #0079bf): same blue, darkened just enough for 4.5:1 text contrast on the light grey/blue backgrounds. */
+  --color-primary: #006dad;
   --color-primary-foreground: #ffffff;
   --color-accent: #009790;
   --color-accent-foreground: #ffffff;
@@ -43,4 +44,9 @@
   .marquee-track {
     animation: none;
   }
+}
+
+/* Telugu pages: prefer fonts that ship with Android, iOS, macOS and Windows. */
+:lang(te) {
+  font-family: "Noto Sans Telugu", "Mandali", "Ramabhadra", "Telugu Sangam MN", "Nirmala UI", "Gautami", system-ui, sans-serif;
 }
