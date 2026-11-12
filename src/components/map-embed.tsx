@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { MapPin } from "lucide-react"
-import { GOOGLE_MAPS_URL, HOSPITAL_NAME } from "../data/contact"
+import { GEO, GOOGLE_MAPS_URL, HOSPITAL_NAME } from "../data/contact"
 
-const EMBED =
-  "https://maps.google.com/maps?hl=en&q=Near%20Mancherial%20Chowrasta%20Cir,%20Ambedkar%20Nagar,%20Saraswathi%20Nagar,%20Karimnagar,%20Telangana%20505001+(Sri%20Harsha%20Eye%20Hospital)&t=&z=15&ie=UTF8&iwloc=B&output=embed"
+/** Pinned at the exact coordinates of the Google listing (a text-address search can land on the wrong spot). */
+const EMBED = `https://maps.google.com/maps?hl=en&q=${GEO.latitude},${GEO.longitude}&z=17&output=embed`
 
 /** Loads Google Maps only when tapped, keeping ~500 KB of map scripts off the page load. */
 export function MapEmbed() {

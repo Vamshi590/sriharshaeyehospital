@@ -28,8 +28,14 @@ export const OPENING_HOURS = [
   { label: "Sunday", days: ["Sunday"], opens: "10:00", closes: "14:30", display: "10 AM - 2:30 PM" },
 ] as const
 
-export const GOOGLE_MAPS_URL =
-  "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Sri Harsha Eye Hospital, Karimnagar")
+/**
+ * The hospital's Google Business Profile listing ("Sri Harsha eye hospital" on Google Maps), by its permanent
+ * customer ID (from https://maps.app.goo.gl/f21o8fbWRNzzJaSj7). Opens the listing: reviews, photos, directions.
+ */
+export const GOOGLE_MAPS_URL = "https://www.google.com/maps?cid=193308467613233427"
+
+/** Exact pin of the Google listing, used for the map embed and the structured data. */
+export const GEO = { latitude: 18.4457047, longitude: 79.1332397 } as const
 
 /** Opens WhatsApp (app or web) with a pre-filled message to the hospital. */
 export function whatsappLink(message: string) {

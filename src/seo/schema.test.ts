@@ -21,7 +21,12 @@ describe("hospital schema", () => {
   })
   it("leaves out facts that are not confirmed yet", () => {
     expect(s).not.toHaveProperty("foundingDate")
-    expect(s).not.toHaveProperty("geo")
+  })
+
+  it("is tied to the hospital's Google Business Profile listing (confirmed pin and link)", () => {
+    expect(s.geo).toEqual({ "@type": "GeoCoordinates", latitude: 18.4457047, longitude: 79.1332397 })
+    expect(s.hasMap).toBe("https://www.google.com/maps?cid=193308467613233427")
+    expect(s.sameAs).toContain("https://www.google.com/maps?cid=193308467613233427")
   })
 })
 

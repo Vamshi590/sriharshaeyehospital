@@ -1,6 +1,8 @@
 import {
   ADDRESS,
   EMAIL,
+  GEO,
+  GOOGLE_MAPS_URL,
   HOSPITAL_NAME,
   OPENING_HOURS,
   PHONE2_TEL,
@@ -31,6 +33,8 @@ export function hospitalSchema(): Json {
     telephone: PHONE_TEL,
     email: EMAIL,
     address: { "@type": "PostalAddress", ...ADDRESS },
+    geo: { "@type": "GeoCoordinates", latitude: GEO.latitude, longitude: GEO.longitude },
+    hasMap: GOOGLE_MAPS_URL,
     areaServed: { "@type": "City", name: "Karimnagar" },
     contactPoint: [PHONE_TEL, PHONE2_TEL].map((telephone) => ({
       "@type": "ContactPoint",
@@ -60,7 +64,8 @@ export function hospitalSchema(): Json {
     award: `Accredited by ${SITE.accreditation}`,
   }
   if (SITE.foundingYear) schema.foundingDate = SITE.foundingYear
-  if (SITE.sameAs.length) schema.sameAs = SITE.sameAs
+  // The Google Business Profile listing first, then any social profiles: ties this site to the Maps listing.
+  schema.sameAs = [GOOGLE_MAPS_URL, ...SITE.sameAs]
   return schema
 }
 
