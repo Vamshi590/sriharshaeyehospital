@@ -138,11 +138,14 @@ describe("site-wide conversion and performance features", () => {
     expect(within(bar).getByRole("link", { name: /call/i })).toHaveAttribute("href", "tel:+919885029367")
     expect(within(bar).getByRole("link", { name: /book/i })).toHaveAttribute("href", "/appointment")
   })
-  it("Google Maps loads only after the visitor asks for it", async () => {
-    const user = userEvent.setup()
+  it("shows the Google Map directly, lazily loaded and pinned at the listing", () => {
     const { container } = renderApp("/contact")
-    expect(container.querySelector("iframe")).toBeNull()
-    await user.click(screen.getByRole("button", { name: "Show map" }))
-    expect(container.querySelector("iframe")).toHaveAttribute("title", "Sri Harsha Eye Hospital location")
+    const map = container.querySelector("iframe")
+    expect(map).toHaveAttribute("title", "Sri Harsha Eye Hospital location")
+    expect(map).toHaveAttribute("loading", "lazy") // fetched only when scrolled near
+    expect(map?.getAttribute("src")).toContain("ll=18.4457047,79.1332397")
+    expect(map?.getAttribute("src")).toContain("q=Sri%20Harsha%20eye%20hospital")
+    expect(screen.queryByRole("button", { name: "Show map" })).not.toBeInTheDocument()
+    expect(screen.getByRole("link", { name: /get directions/i })).toHaveAttribute("href", "https://www.google.com/maps?cid=193308467613233427")
   })
 })
