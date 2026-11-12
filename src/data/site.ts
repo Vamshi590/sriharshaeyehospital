@@ -3,10 +3,17 @@
  * Optional fields stay `undefined` until the hospital confirms them; nothing
  * unconfirmed is ever rendered or put into structured data.
  */
+/** The hospital's own domain. sriharshaeyehospital.com redirects here, and so does the old *.vercel.app address (vercel.json). */
+export const PRODUCTION_URL = "https://www.sriharshaeyehospital.com"
+
 const envUrl = (import.meta.env.VITE_SITE_URL as string | undefined)?.trim()
 
-/** Public origin of the live site, without a trailing slash. Set VITE_SITE_URL in Vercel. */
-export const SITE_URL = (envUrl || "https://sriharshaeyehospital.vercel.app").replace(/\/+$/, "")
+/**
+ * Public origin used for canonical URLs, the sitemap, hreflang, Open Graph and structured data
+ * (no trailing slash). VITE_SITE_URL can override it, but a *.vercel.app value is ignored:
+ * that address only redirects, so it must never be advertised to search engines as canonical.
+ */
+export const SITE_URL = (envUrl && !/\.vercel\.app\/?$/i.test(envUrl) ? envUrl : PRODUCTION_URL).replace(/\/+$/, "")
 
 export const SITE = {
   shortDescription:
@@ -25,6 +32,14 @@ export const SITE = {
    */
   review: undefined as { by: string; date: string } | undefined,
   languages: ["English", "Telugu", "Hindi"],
+  /**
+   * Search-engine ownership tokens (the `content` value of the verification meta tag), set in Vercel as
+   * VITE_GOOGLE_SITE_VERIFICATION / VITE_BING_SITE_VERIFICATION. Not needed if the domain is verified by DNS.
+   */
+  verification: {
+    google: (import.meta.env.VITE_GOOGLE_SITE_VERIFICATION as string | undefined)?.trim() || undefined,
+    bing: (import.meta.env.VITE_BING_SITE_VERIFICATION as string | undefined)?.trim() || undefined,
+  },
   schemes: ["Aarogyasri", "EHS (Employees Health Scheme, Telangana)"],
 }
 

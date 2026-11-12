@@ -42,7 +42,7 @@ export default function Home() {
     { title: "Vitrectomy Equipment", description: "Advanced retinal surgery tools" },
     { title: "A-Scan Biometry", description: "Accurate lens power calculation before cataract surgery" },
     { title : "Pediatric Retina Checkup", description : "Gentle, compassionate care for children"},
-    {title : "Visual Fields", description : "Advanced Glaucoma and Stroke care"},
+    { title: "Visual Fields", description: "Side-vision testing for glaucoma and optic nerve disease" },
     {title : "Fundus Fluorescein Angiography", description : "Advanced Retinal Diseases Care"}
   ]
 

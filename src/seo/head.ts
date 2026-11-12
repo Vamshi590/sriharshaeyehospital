@@ -27,6 +27,8 @@ export function headTags(meta: RouteMeta): HeadTag[] {
     { tag: "meta", attr: "name", key: "twitter:description", content: meta.description },
     { tag: "meta", attr: "name", key: "twitter:image", content: image },
   ]
+  if (SITE.verification.google) tags.push({ tag: "meta", attr: "name", key: "google-site-verification", content: SITE.verification.google })
+  if (SITE.verification.bing) tags.push({ tag: "meta", attr: "name", key: "msvalidate.01", content: SITE.verification.bing })
   if (!meta.noindex) tags.push({ tag: "link", rel: "canonical", href: url })
   if (meta.alternate && !meta.noindex) {
     const lang = meta.lang ?? "en"

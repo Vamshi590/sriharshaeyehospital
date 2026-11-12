@@ -83,10 +83,11 @@ export default function DoctorsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             {[
-              { number: `${doctors.length}`, label: "Expert Doctors" },
+              // Only facts stated elsewhere on the site (doctor data, NABH status); no unsourced percentages.
+              { number: `${doctors.length}`, label: "Doctors" },
               { number: "75+", label: "Years Combined Experience" },
-              { number: "30K+", label: "Successful Surgeries" },
-              { number: "98%", label: "Patient Satisfaction" },
+              { number: "20,000+", label: "Cataract Surgeries by Dr. Srilatha CH" },
+              { number: "NABH", label: "Accredited Hospital" },
             ].map((stat, index) => (
               <div key={index}>
                 <p className="text-4xl font-bold text-primary mb-2">{stat.number}</p>
