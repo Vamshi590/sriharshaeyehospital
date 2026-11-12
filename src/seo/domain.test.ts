@@ -27,10 +27,11 @@ describe("canonical domain", () => {
 
   it("permanently redirects every path on the old vercel.app address to the same path on the domain", () => {
     const config = JSON.parse(fs.readFileSync(path.resolve(import.meta.dirname, "../../vercel.json"), "utf8"))
+    // "/(.*)" (not "/:path*") so the home page "/" is redirected too.
     expect(config.redirects).toContainEqual({
-      source: "/:path*",
+      source: "/(.*)",
       has: [{ type: "host", value: "sriharshaeyehospital.vercel.app" }],
-      destination: "https://www.sriharshaeyehospital.com/:path*",
+      destination: "https://www.sriharshaeyehospital.com/$1",
       permanent: true,
     })
   })

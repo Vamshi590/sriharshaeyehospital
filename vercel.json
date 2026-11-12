@@ -4,14 +4,14 @@
   "trailingSlash": false,
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [
         {
           "type": "host",
           "value": "sriharshaeyehospital.vercel.app"
         }
       ],
-      "destination": "https://www.sriharshaeyehospital.com/:path*",
+      "destination": "https://www.sriharshaeyehospital.com/$1",
       "permanent": true
     }
   ],
