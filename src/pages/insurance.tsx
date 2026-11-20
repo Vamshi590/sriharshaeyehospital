@@ -2,7 +2,7 @@ import { PageHeader } from "../components/page-header"
 import { CtaBand } from "../components/cta-band"
 import { FaqList } from "../components/faq-list"
 import { INSURERS, SCHEMES, TPAS } from "../data/insurance"
-import { PHONE_DISPLAY } from "../data/contact"
+import { HOSPITAL_NAME, PHONE_DISPLAY } from "../data/contact"
 
 const steps = [
   "Call us or tell the front desk your scheme or insurer when you book.",
@@ -13,6 +13,14 @@ const steps = [
 ]
 
 const faqs = [
+  {
+    question: `Which health insurance is accepted for cashless eye treatment in Karimnagar at ${HOSPITAL_NAME}?`,
+    answer: `Cashless treatment is available with ${INSURERS.join(", ")}, and through the TPA ${TPAS.join(", ")}, for treatment your policy covers. Aarogyasri and EHS are accepted for eligible patients.`,
+  },
+  {
+    question: "Which eye treatments does insurance usually cover?",
+    answer: "Most policies cover medically necessary surgery and in-patient care, such as cataract surgery. Cover for consultations, tests, spectacles and premium lenses depends on your policy. Our desk checks your policy before treatment so you know what you will pay.",
+  },
   { question: "Is cataract surgery covered under Aarogyasri?", answer: "Eligible patients can have cataract surgery under Aarogyasri. Bring your card and Aadhaar; our desk confirms eligibility and handles the approval." },
   { question: "Do you accept EHS (Employees Health Scheme)?", answer: "Yes, for eligible Telangana government employees and pensioners. Bring your EHS card." },
   { question: "My insurer isn't listed. Can I still claim?", answer: `You may be able to pay and claim reimbursement from your insurer. Call ${PHONE_DISPLAY} and we'll tell you what documents you need.` },

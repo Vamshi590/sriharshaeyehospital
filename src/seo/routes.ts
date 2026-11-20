@@ -27,9 +27,10 @@ const base: RouteMeta[] = [
   {
     path: "/",
     label: "Home",
-    title: `${H}, Karimnagar | NABH Eye Hospital`,
+    // Leads with the phrase people search ("eye hospital in Karimnagar"); no superlatives (NMC rules).
+    title: `Eye Hospital in Karimnagar | ${H} (NABH)`,
     description:
-      "NABH-accredited eye hospital in Karimnagar for cataract surgery, retina, glaucoma, cornea, oculoplasty and children's eye care. Aarogyasri and EHS accepted.",
+      "NABH-accredited eye hospital in Karimnagar: experienced eye doctors for cataract, retina, glaucoma and children's eyes. Aarogyasri, EHS, cashless insurance.",
     changefreq: "weekly",
     priority: 1,
     alternate: "/te",
@@ -46,7 +47,7 @@ const base: RouteMeta[] = [
   {
     path: "/doctors",
     label: "Doctors",
-    title: `Eye Specialists in Karimnagar | ${H}`,
+    title: `Eye Doctors in Karimnagar | ${H}`,
     description:
       "Meet the ophthalmologists at Sri Harsha Eye Hospital, Karimnagar: cataract, retina, oculoplasty, cornea and paediatric eye specialists, with OPD timings.",
     changefreq: "monthly",
@@ -55,7 +56,7 @@ const base: RouteMeta[] = [
   {
     path: "/appointment",
     label: "Book an Appointment",
-    title: `Book an Eye Appointment | ${H}`,
+    title: `Book an Eye Doctor in Karimnagar | ${H}`,
     description:
       "Book an eye check-up or consultation at Sri Harsha Eye Hospital, Karimnagar online, by phone or on WhatsApp. We confirm your slot within 24 hours.",
     changefreq: "yearly",
@@ -84,7 +85,7 @@ const base: RouteMeta[] = [
     path: "/patients/insurance",
     parent: "/patients",
     label: "Insurance and Schemes",
-    title: `Aarogyasri, EHS and Insurance | ${H}`,
+    title: `Aarogyasri, EHS & Cashless Eye Care | Sri Harsha Karimnagar`,
     description:
       "Aarogyasri, EHS and cashless insurance at Sri Harsha Eye Hospital, Karimnagar: insurers accepted, documents to bring and the cashless process step by step.",
     changefreq: "monthly",

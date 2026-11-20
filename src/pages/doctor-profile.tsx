@@ -2,11 +2,46 @@ import { Link, useParams } from "react-router-dom"
 import { Clock, GraduationCap, Languages, Briefcase, BadgeCheck } from "lucide-react"
 import { PageHeader } from "../components/page-header"
 import { CtaBand } from "../components/cta-band"
+import { FaqList } from "../components/faq-list"
 import { JsonLd } from "../components/json-ld"
-import { doctorBySlug } from "../data/doctors"
+import { doctorBySlug, type Doctor } from "../data/doctors"
+import type { Service } from "../data/services"
+import { ADDRESS_LINE_1, ADDRESS_LINE_2, HOSPITAL_NAME, PHONE_DISPLAY } from "../data/contact"
+import { INSURERS, SCHEMES } from "../data/insurance"
 import { services, servicePath } from "../data/services"
 import { physicianSchema } from "../seo/schema"
 import NotFound from "./not-found"
+
+/**
+ * Questions patients search for ("Dr X timings", "how to book Dr X"), answered only from the
+ * doctor's own data and the hospital's contact details: no new claims.
+ */
+function doctorFaqs(d: Doctor, treats: Service[]) {
+  const faqs = [
+    {
+      question: `Where does ${d.name} consult?`,
+      answer: `${d.name} consults at ${HOSPITAL_NAME}, ${ADDRESS_LINE_1}, ${ADDRESS_LINE_2}${d.availability === "visiting" ? ", as a visiting consultant" : ""}.`,
+    },
+    {
+      question: `What are ${d.name}'s OPD timings?`,
+      answer: d.timings ? `${d.timings}. Please book ahead or call ${PHONE_DISPLAY} to confirm.` : `Call ${PHONE_DISPLAY} for ${d.name}'s current OPD timings.`,
+    },
+    {
+      question: `How do I book an appointment with ${d.name}?`,
+      answer: `Book online and choose ${d.name} on the booking form, call ${PHONE_DISPLAY}, or message us on WhatsApp. Our team calls you to confirm the time.`,
+    },
+  ]
+  if (treats.length)
+    faqs.push({
+      question: `What does ${d.name} treat at ${HOSPITAL_NAME}?`,
+      answer: `${d.name} (${d.specialization}) sees patients for ${treats.map((s) => s.name.toLowerCase()).join(", ")}.`,
+    })
+  faqs.push({
+    question: "Are Aarogyasri, EHS and health insurance accepted?",
+    answer: `Yes, for eligible treatment: ${SCHEMES.join(" and ")}, and cashless insurance with ${INSURERS.join(", ")}. Bring your card when you visit.`,
+  })
+  return faqs
+}
 
 export default function DoctorProfile() {
   const { slug } = useParams()
@@ -54,6 +89,7 @@ export default function DoctorProfile() {
             )}
           </div>
         </div>
+        <FaqList faqs={doctorFaqs(d, treats)} heading={`Consulting ${d.name}`} />
         <CtaBand doctor={d.name} message={`Hello, I would like to book a consultation with ${d.name}.`} />
         <p className="text-sm"><Link to="/doctors" className="text-primary font-semibold hover:underline">See all doctors</Link></p>
       </div>

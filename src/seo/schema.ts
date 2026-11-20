@@ -35,7 +35,11 @@ export function hospitalSchema(): Json {
     address: { "@type": "PostalAddress", ...ADDRESS },
     geo: { "@type": "GeoCoordinates", latitude: GEO.latitude, longitude: GEO.longitude },
     hasMap: GOOGLE_MAPS_URL,
-    areaServed: { "@type": "City", name: "Karimnagar" },
+    areaServed: [
+      { "@type": "City", name: "Karimnagar" },
+      { "@type": "AdministrativeArea", name: "Karimnagar district, Telangana" },
+    ],
+    isAcceptingNewPatients: true,
     contactPoint: [PHONE_TEL, PHONE2_TEL].map((telephone) => ({
       "@type": "ContactPoint",
       telephone,
